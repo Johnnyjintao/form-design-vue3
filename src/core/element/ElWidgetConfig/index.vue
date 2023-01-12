@@ -1,5 +1,5 @@
 <template>
-  <el-form label-position="right" label-width="85px" size="small" v-if="data" :key="data.key">
+  <el-form label-position="right" label-width="85px"  v-if="data" :key="data.key">
     <el-form-item label="字段标识" v-if="data.type !== 'grid' && data.type !== 'toggle'">
       <el-input v-model="data.model" />
     </el-form-item>
@@ -130,27 +130,3 @@ export default defineComponent({
   },
 })
 </script>
-
-<style  scoped>
-  .el-form-item{
-    margin-bottom: 10px !important;
-  }
-  ul{
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    
-  }
-  .drag-li{
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-    font-size: 25px;
-  }
-  .drag-item{
-    font-size:24px;
-    margin:0 5px;
-    cursor:move;
-  }
-</style>
-  

@@ -3,9 +3,8 @@
     <slot></slot>
     <el-button
       v-if="$attrs.uploadJson"
-      type="text"
-      @click="$emit('uploadJson')"
-    >
+      text
+      @click="$emit('uploadJson')">
       <template #icon>
         <SvgIcon iconClass="upload" />
       </template>
@@ -13,9 +12,8 @@
     </el-button>
     <el-button
       v-if="$attrs.clearable"
-      type="text"
-      @click="$emit('clearable')"
-    >
+      text
+      @click="$emit('clearable')">
       <template #icon>
         <SvgIcon iconClass="clearable" />
       </template>
@@ -23,9 +21,8 @@
     </el-button>
     <el-button
       v-if="$attrs.preview"
-      type="text"
-      @click="$emit('preview')"
-    >
+      text
+      @click="$emit('preview')">
       <template #icon>
         <SvgIcon iconClass="preview" />
       </template>
@@ -33,9 +30,8 @@
     </el-button>
     <el-button
       v-if="$attrs.generateJson"
-      type="text"
-      @click="$emit('generateJson')"
-    >
+      text
+      @click="$emit('generateJson')">
       <template #icon>
         <SvgIcon iconClass="generate-json" />
       </template>
@@ -43,9 +39,8 @@
     </el-button>
     <el-button
       v-if="$attrs.generateCode"
-      type="text"
-      @click="$emit('generateCode')"
-    >
+      text
+      @click="$emit('generateCode')">
       <template #icon>
         <SvgIcon iconClass="generate-code" />
       </template>

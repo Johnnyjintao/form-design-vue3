@@ -1,7 +1,7 @@
 <template>
   <div class="fc-style">
     <el-form
-      ref="formRef"
+      ref="generateForm"
       label-suffix=":"
       :model="model"
       :rules="rules"
@@ -11,8 +11,8 @@
       :hide-required-asterisk="widgetForm.config.hideRequiredAsterisk"
       :style="initFormStyle()"
     >
-      <template v-for="(element, index) of widgetForm.list" v-if="initShowNum(index)">
-        <template v-if="element.type === 'grid'">
+      <template v-for="(element, index) of widgetForm.list">
+        <template v-if="initShowNum(index) && element.type === 'grid'">
           <el-row
             type="flex"
             v-if="element.key"
@@ -26,43 +26,42 @@
               :key="colIndex"
               :span="col.span ?? 0"
             >
+            <div :key="colItem.key" v-for="colItem of col.list">
               <component
-                v-for="colItem of col.list"
                 v-if="colItem.type!='toggle'"
                 :key="colItem.key"
                 :is="colItem.type+'Item'"
-                :model.sync="model"
+                v-model:model="model"
                 :element="colItem"
                 :config="data.config"
                 :disabled="disabled"
-                @change="onFormChange"
               />
+            </div>
             </el-col>
           </el-row>
         </template>
         <component
           v-if="widgetForm.list[index].type!='toggle'"
           :is="widgetForm.list[index].type+'Item'"
-          :model.sync="model"
+          v-model:model="model"
           :key="element.key"
           :element="widgetForm.list[index]"
           :config="data.config"
           :disabled="disabled"
-          @change="onFormChange"
         />
       </template>
     </el-form>
 
     <toggle v-if="toggleData"
           :open="isopen"
-          :model.sync="model"
+          v-model:model="model"
           :element="toggleData"
           :config="data.config"
-          @change="(val)=>{isopen=val}"></toggle>
+          @change="(val:boolean)=>{isopen=val}"></toggle>
   </div>
 </template>
   
-<script>
+<script lang="ts">
   import inputItem from './input.vue';
   import selectItem from './select.vue';
   import radioItem from './radio.vue';
@@ -76,25 +75,25 @@
   import textItem from './text.vue';
   import imageItem from './image.vue';
   import toggle from './toggle.vue';
-
+  import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
   import { widgetForm } from '@/config/element'
-  
-  export default {
+  import { ElMessage } from 'element-plus'
+  export default defineComponent({
     name: 'ElGenerateForm',
     components: {
-        inputItem,
-        selectItem,
-        radioItem,
-        checkboxItem,
-        timeItem,
-        dateItem,
-        numrangeItem,
-        rateItem,
-        switchItem,
-        sliderItem,
-        textItem,
-        imageItem,
-        toggle
+      inputItem,
+      selectItem,
+      radioItem,
+      checkboxItem,
+      timeItem,
+      dateItem,
+      numrangeItem,
+      rateItem,
+      switchItem,
+      sliderItem,
+      textItem,
+      imageItem,
+      toggle
     },
     props: {
       data: {
@@ -109,98 +108,131 @@
         default: false
       }
     },
-    data(){
-      return {
-        model: {},
-        rules: {},
-        widgetForm: (this.$props.data && JSON.parse(JSON.stringify(this.$props.data))) ?? widgetForm,
-        toggleData:null,
+    emits: ['update:model'],
+    setup(props) {
+      const state = reactive({
+        generateForm: null as any,
+        model: {} as any,
+        rules: {} as any,
+        widgetForm:
+          (props.data && JSON.parse(JSON.stringify(props.data))) ??
+          widgetForm,
+        toggleData:null as any,
         isopen:true,
-      }
-    },
-    watch:{
-      "$props.data":{
-        deep: true,
-        immediate: true ,
-        handler(val){
-          this.widgetForm = (val && JSON.parse(JSON.stringify(val))) ?? widgetForm;
-          this.model = {};
-          this.rules = {};
-          this.generateModel(this.widgetForm.list);
-        }
-      }
-    },
-    mounted(){
-      this.generateModel(this.widgetForm?.list ?? [])
-    },
-    methods:{
-      initFormStyle(){
-        if(this.toggleData && this.toggleData.options.type==='height' && this.isopen){
-          return `height:auto;`
-        }
-        if(this.toggleData && this.toggleData.options.type==='height' && !this.isopen){
-          return `height:${this.toggleData.options.height};overflow:hidden;`
-        }
-        return  ""
-      },
-      initShowNum(index){
-        if(this.toggleData && this.toggleData.options.type==='num' && !this.isopen){
-          let num = this.toggleData.options.num;
-          if(index+1 > num){
-            return false
-          }
-        }
-        return true;
-      },
-     
-      onFormChange(model){
-        this.$emit("change",model)
-      },
-      generateModel(list) {
+      })
+
+      const generateModel = (list: any[]) => {
         for (let index = 0; index < list.length; index++) {
           const model = list[index].model
           if (!model) {
             return
           }
           if (list[index].type === 'grid') {
-            list[index].columns.forEach((col) => this.generateModel(col.list))
+            list[index].columns.forEach((col: any) => generateModel(col.list))
           } else {
-            if (this.$props.value && Object.keys(this.$props.value).includes(model)) {
-              this.$set(this.model,model,this.$props.value[model])
+            if (props.value && Object.keys(props.value).includes(model)) {
+              state.model[model] = props.value[model]
             } else {
-              this.$set(this.model,model,list[index].options.defaultValue)
+              state.model[model] = list[index].options.defaultValue
             }
-            if(list[index].options.rules){
-              this.$set(this.rules,model,[list[index].options.rules])
-            }
-          }
 
-          if(list[index].type == 'toggle'){
-            this.toggleData = list[index];
-            this.isopen = list[index].options.defaultValue;
+            state.rules[model] = list[index].options.rules
           }
         }
-      },
+      }
 
-      getData() {
-        return new Promise((resolve, reject) => {
-          this.$refs.formRef.validate().then((validate) => {
-            if (validate) {
-              resolve(this.model)
-            } else {
-              this.$message.error('验证失败')
+      const generateOptions = (list: any[]) => {
+        list.forEach(item => {
+          if (item.type === 'grid') {
+            item.columns.forEach((col: any) => generateOptions(col.list))
+          } else {
+            if (item.options.remote && item.options.remoteFunc) {
+              fetch(item.options.remoteFunc)
+                .then(resp => resp.json())
+                .then(json => {
+                  if (json instanceof Array) {
+                    item.options.remoteOptions = json.map(data => ({
+                      label: data[item.options.props.label],
+                      value: data[item.options.props.value],
+                      children: data[item.options.props.children]
+                    }))
+                  }
+                })
             }
-          }).catch((error) => {
-            reject(error)
-          })
+          }
         })
-      },
-  
-      reset() {
-        this.$refs.formRef.resetFields()
-      },
-    }
-  }
+      }
+
+      watch(
+        () => props.data,
+        val => {
+          state.widgetForm =
+            (val && JSON.parse(JSON.stringify(val))) ?? widgetForm
+          state.model = {}
+          state.rules = {}
+          generateModel(state.widgetForm.list)
+          generateOptions(state.widgetForm.list)
+        },
+        { deep: true, immediate: true }
+      )
+
+      onMounted(() => {
+        generateModel(state.widgetForm?.list ?? [])
+        generateOptions(state.widgetForm?.list ?? [])
+      })
+
+      const getData = () => {
+        return new Promise((resolve, reject) => {
+          state.generateForm
+            .validate()
+            .then((validate: boolean) => {
+              if (validate) {
+                resolve(state.model)
+              } else {
+                ElMessage.error('验证失败')
+              }
+            })
+            .catch((error: Error) => {
+              reject(error)
+            })
+        })
+      }
+
+      const reset = () => {
+        state.generateForm.resetFields()
+      }
+
+      const initFormStyle = ()=> {
+        if(state.toggleData && state.toggleData.options.type==='height' && state.isopen){
+          return `height:auto;`
+        }
+        if(state.toggleData && state.toggleData.options.type==='height' && !state.isopen){
+          return `height:${state.toggleData.options.height};overflow:hidden;`
+        }
+        return  ""
+      }
+      
+      const initShowNum = (index:number)=> {
+        if(state.toggleData && state.toggleData.options.type==='num' && !state.isopen){
+          let num = state.toggleData.options.num;
+          if(index+1 > num){
+            return false
+          }
+        }
+        return true;
+      }
+     
+    
+      return {
+        ...toRefs(state),
+        getData,
+        reset,
+        initShowNum,
+        initFormStyle,
+      }
+    },
+    
+  })
   </script>
 
 <style scoped>

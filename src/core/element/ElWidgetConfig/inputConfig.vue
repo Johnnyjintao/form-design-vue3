@@ -3,7 +3,7 @@
   <div v-if="data">
     <el-form-item label="类型">
       <el-select v-model="data.options.type">
-        <el-option value="text" label="文本" />
+        <el-option value="link" label="文本" />
         <el-option value="textarea" label="文本域" />
         <el-option value="number" label="数字" />
         <el-option value="password" label="密码" />
@@ -79,13 +79,10 @@
 </template>
   
   <script>
-  import SvgIcon from '@/components/SvgIcon.vue'
   
   export default {
     name: 'inputConfig',
-    components: {
-      SvgIcon
-    },
+   
     props: {
       select: {
         type: Object

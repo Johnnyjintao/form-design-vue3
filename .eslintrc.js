@@ -29,6 +29,11 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'quotes': 'off',
     'semi': 'off',
-    'comma-spacing': 'off'
+    'comma-spacing': 'off',
+    'arrow-spacing': 'off',
+    'space-infix-ops': 'off',
+    'keyword-spacing': 'off',
+    'prefer-const': 'off',
+    'no-multi-spaces': 'off',
   }
 }
