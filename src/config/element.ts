@@ -252,8 +252,8 @@ export const advanceComponents = [
       width:'100%',
       imgWidth:'100px',
       imgHeight:'100px',
-      srcList: [{url:'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'}],
-      previewSrcList:[{url:'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'}],
+      srcList: [{ url:'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg' }],
+      previewSrcList:[{ url:'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg' }],
     }
   },
 ]
@@ -284,7 +284,7 @@ export const layoutComponents = [
     options: {
       alignItems:'center',
       justifyContent:'center',
-      type:'height',//height 按高度展开收起  num按组件个数展开收起
+      type:'height', // height 按高度展开收起  num按组件个数展开收起
       height:'70px',
       num:3,
     },
