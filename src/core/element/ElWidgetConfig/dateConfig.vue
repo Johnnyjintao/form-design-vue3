@@ -54,78 +54,32 @@
     </template>
   </div>
 </template>
-  
-  <script>
-  import Draggable from 'vuedraggable'
-  import SvgIcon from '@/components/SvgIcon.vue'
-  
-  export default {
-    name: 'inputConfig',
-    components: {
-      Draggable,
-      SvgIcon
-    },
-    props: {
-      select: {
-        type: Object
-      }
-    },
-    emits: ['update:select'],
-    data(){
-      return {
-        data:undefined
-      }
-    },
-    watch:{
-      data:{
-        deep:true,
-        handler(val){
-          if(val.options.type === "datetimerange"){
-            val.options.startPlaceholder = "开始日期";
-            val.options.endPlaceholder = "结束日期";
-            val.options["default-time"] = ["00:00:00","23:59:59"];
-          }
 
-          if(val.options.type === "datetime"){
-            val.options.startPlaceholder = "开始日期";
-            val.options.endPlaceholder = "结束日期";
-          }
-
-          this.$emit('update:select',val)
-        },
-      },
-      select:{
-        deep:true,
-        handler(val){
-          this.data = val;
-        },
-      },
+<script lang="ts">
+import { defineComponent, ref, watch } from 'vue'
+export default defineComponent({
+  name: 'inputConfig',
+  props: {
+    select: {
+      type: Object
     },
-    mounted(){
-      this.data = this.$props.select;
-    },
-    methods:{
-      hasKey(key){
-        return Object.keys(this.data.options).includes(key)
-      },
-  
-  
-      handleInsertOption(){
-        const index = this.data.options.options.length + 1
-        this.data.options.options.push({
-          label: `label ${index}`,
-          value: `value ${index}`
-        })
-      },
-  
-      handleOptionsRemove(index){
-        if (this.data.type === 'grid') {
-          this.data.columns.splice(index, 1)
-        } else {
-          this.data.options.options.splice(index, 1)
-        }
-      },
+    hasKey: {
+      type: Function
     }
-  }
-  </script>
-  
+  },
+  emits: ['update:select'],
+  setup(props, context){
+    const data = ref<any>(props.select)
+    watch(
+      () => props.select,
+      (val) => (data.value = val)
+    )
+
+    watch(data, (val) => context.emit('update:select', val), { deep: true })
+    
+    return {
+      data,
+    }
+  },
+})
+</script>

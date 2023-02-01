@@ -1,13 +1,14 @@
 <template>
-    <div class="toggle" :style="initStyle()" @click="toggle">
-      <span>{{ isopen ? "收起" : "展开" }}</span>
-      <i :class="isopen ? 'el-icon-arrow-up' : 'el-icon-arrow-down'"></i>
-    </div>
+  <div class="toggle" :style="initStyle()" @click="toggle">
+    <span>{{ isopen ? "收起" : "展开" }}</span>
+    <i :class="isopen ? 'el-icon-arrow-up' : 'el-icon-arrow-down'"></i>
+  </div>
 </template>
 
 <script>
+  import { defineComponent, reactive, toRefs } from 'vue'
   
-  export default {
+  export default defineComponent({
     name: 'toggleItem',
     components: {
     },
@@ -35,24 +36,29 @@
         isopen:true,
       }
     },
-    mounted(){
-      this.isopen = this.$props.open;
-    },
-    watch:{
-      "$props.open":function(val){
-        this.isopen = val;
+    setup(props,context){
+      const state = reactive({
+        data:"",
+        isopen:props.open
+      })
+
+      const toggle = ()=>{
+        state.isopen = !this.isopen;
+        context.emit("change",this.isopen)
       }
-    },
-    methods:{
-      toggle(){
-        this.isopen = !this.isopen;
-        this.$emit("change",this.isopen)
-      },
-      initStyle(){
-        return `display:flex;alignItems:${this.element.options.alignItems};justifyContent:${this.element.options.justifyContent}`
+
+      const initStyle = ()=>{
+        return `display:flex;alignItems:${props.element.options.alignItems};justifyContent:${this.element.options.justifyContent}`
+      }
+
+      return {
+        ...toRefs(state),
+        toggle,
+        initStyle
       }
     }
-  }
+    
+  })
   </script>
 
 <style scoped>

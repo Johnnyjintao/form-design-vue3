@@ -35,5 +35,6 @@ module.exports = {
     'keyword-spacing': 'off',
     'prefer-const': 'off',
     'no-multi-spaces': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off'
   }
 }

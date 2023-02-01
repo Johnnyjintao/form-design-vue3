@@ -10,7 +10,6 @@
   >
     <template #item="{ element }">
       <li
-        v-if="fields.includes(element.type)"
         class="form-edit-widget-label"
         :class="{ 'no-put': element.tpye === 'divider' }"
       >
@@ -24,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent } from 'vue'
 import Draggable from 'vuedraggable'
 import SvgIcon from './SvgIcon.vue'
 
@@ -39,10 +38,7 @@ export default defineComponent({
       type: String,
       required: true
     },
-    fields: {
-      type: Array as PropType<Array<string>>,
-      required: true
-    },
+   
     list: {
       required: true
     }

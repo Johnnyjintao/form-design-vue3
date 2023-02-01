@@ -12,49 +12,43 @@
     </el-form-item>
   </template>
   
-  <script>
-  
-  export default {
-    name: 'sliderItem',
-    components: {
+  <script lang="ts">
+import { defineComponent, reactive, toRefs, watch } from 'vue'
+export default defineComponent({
+  name: 'sliderItem',
+  components: {
+  },
+  emits:["update:model"],
+  props: {
+    config: {
+      type: Object,
+      required: true
     },
-    props: {
-      config: {
-        type: Object,
-        required: true
-      },
-      element: {
-        type: Object,
-        required: true
-      },
-      model: {
-        type: Object,
-        required: true
-      },
-      disabled: {
-        type: Boolean,
-        required: true
-      }
+    element: {
+      type: Object,
+      required: true
     },
-
-    data(){
-      return {
-        data:0,
-      }
+    model: {
+      type: Object,
+      required: true
     },
-    mounted(){
-      this.data = this.$props.model[this.$props.element.model];
-    },
-    watch:{
-      data(val){
-        let newmodel = this.$props.model;
-        newmodel[this.$props.element.model] = val
-        this.$emit("change",newmodel)
-      },
-    },
-    methods:{
-      
+    disabled: {
+      type: Boolean,
+      required: true
     }
-  }
-  </script>
-  
+  },
+  setup(props,context){
+    const state = reactive({
+      data:props.model[props.element.model],
+    })
+    watch(()=>state.data,(val)=>{
+      let newmodel = props.model;
+      newmodel[props.element.model] = val
+      context.emit("update:model",newmodel)
+    })
+    return {
+      ...toRefs(state)
+    }
+  },  
+})
+</script>

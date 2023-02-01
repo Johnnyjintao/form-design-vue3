@@ -6,7 +6,7 @@
     </el-form-item>
 
     <el-form-item label="列配置项">
-      <ul v-for="(element, index) in data.columns">
+      <ul :key="element" v-for="(element, index) in data.columns">
         <li style="margin-bottom: 5px">
           <el-input-number placeholder="栅格值" v-model="element.span" :min="0" :max="24" />
           <el-button type="primary" circle style="margin-left: 5px" @click="handleOptionsRemove(index)">
@@ -41,60 +41,49 @@
   </div>
 </template>
   
-  <script>
-  import Draggable from 'vuedraggable'
-  import SvgIcon from '@/components/SvgIcon.vue'
-  
-  export default {
-    name: 'inputConfig',
-    components: {
-      Draggable,
-      SvgIcon
+<script lang="ts">
+import { defineComponent, ref, watch } from 'vue'
+import SvgIcon from '@/components/SvgIcon.vue'
+
+export default defineComponent({
+  name: 'inputConfig',
+  props: {
+    select: {
+      type: Object
     },
-    props: {
-      select: {
-        type: Object
-      }
-    },
-    emits: ['update:select'],
-    data(){
-      return {
-        data:undefined
-      }
-    },
-    watch:{
-      data:{
-        deep:true,
-        handler(val){
-          this.$emit('update:select',val)
-        },
-      },
-      select:{
-        deep:true,
-        handler(val){
-          this.data = val;
-        },
-      },
-    },
-    mounted(){
-      this.data = this.$props.select;
-    },
-    methods:{
-      hasKey(key){
-        return Object.keys(this.data.options).includes(key)
-      },
-  
-      handleInsertColumn(){
-        this.data.columns.push({
-          span: 0,
-          list: []
-        })
-      },
-  
-      handleOptionsRemove(index){
-        this.data.columns.splice(index, 1)
-      },
+    hasKey: {
+      type: Function
     }
-  }
-  </script>
-  
+  },
+  components: {
+    SvgIcon
+  },
+  emits: ['update:select'],
+  setup(props, context){
+    const data = ref<any>(props.select)
+    watch(
+      () => props.select,
+      (val) => (data.value = val)
+    )
+
+    watch(data, (val) => context.emit('update:select', val), { deep: true })
+    const handleInsertColumn = ()=>{
+      data.value.columns.push({
+        span: 0,
+        list: []
+      })
+    }
+
+    const handleOptionsRemove = (index:number)=>{
+      data.value.columns.splice(index, 1)
+    }
+    
+    return {
+      data,
+      handleInsertColumn,
+      handleOptionsRemove
+    }
+  },
+})
+</script>
+

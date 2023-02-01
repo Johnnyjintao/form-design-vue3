@@ -24,12 +24,13 @@
     </el-form-item>
   </template>
   
-  <script>
-  
-  export default {
-    name: 'checkboxItem',
+  <script lang="ts">
+  import { defineComponent, reactive, toRefs, watch } from 'vue'
+  export default defineComponent({
+    name: 'inputItem',
     components: {
     },
+    emits:["update:model"],
     props: {
       config: {
         type: Object,
@@ -48,25 +49,19 @@
         required: true
       }
     },
-
-    data(){
+    setup(props,context){
+      const state = reactive({
+        data:props.model[props.element.model],
+      })
+      watch(()=>state.data,(val)=>{
+        let newmodel = props.model;
+        newmodel[props.element.model] = val
+        context.emit("update:model",newmodel)
+      })
       return {
-        data:[],
+        ...toRefs(state)
       }
-    },
-    mounted(){
-      this.data = this.$props.model[this.$props.element.model]||[];
-    },
-    watch:{
-      data(val){
-        let newmodel = this.$props.model;
-        newmodel[this.$props.element.model] = val
-        this.$emit("change",newmodel)
-      },
-    },
-    methods:{
-      
-    }
-  }
+    },  
+  })
   </script>
   

@@ -9,7 +9,7 @@
     </el-form-item>
     <el-form-item label="图片列表">
       <ul>
-        <li v-for="(element,index) in data.options.srcList" style="display: flex; align-items: center; margin-bottom: 5px">
+        <li :key="element" v-for="(element,index) in data.options.srcList" style="display: flex; align-items: center; margin-bottom: 5px">
           <el-input v-model="element.url" placeholder="请输入图片地址"></el-input>
           <el-button type="primary" circle @click="srcListRemove(index)" :style="{marginLeft:'5px'}">
             <SvgIcon iconClass="delete" />
@@ -23,7 +23,7 @@
 
     <el-form-item label="预览列表">
       <ul>
-        <li v-for="(element,index) in data.options.previewSrcList" style="display: flex; align-items: center; margin-bottom: 5px">
+        <li :key="element" v-for="(element,index) in data.options.previewSrcList" style="display: flex; align-items: center; margin-bottom: 5px">
           <el-input v-model="element.url" placeholder="请输入图片地址"></el-input>
           <el-button type="primary" circle @click="previewSrcListRemove(index)" :style="{marginLeft:'5px'}">
             <SvgIcon iconClass="delete" />
@@ -37,87 +37,58 @@
   </div>
 </template>
 
-<script>
-  import SvgIcon from '@/components/SvgIcon.vue'
-  
-  export default {
-    name: 'imageConfig',
-    components: {
-      SvgIcon
-    },
-    props: {
-      select: {
-        type: Object
-      }
-    },
-    emits: ['update:select'],
-    data(){
-      return {
-        data:undefined
-      }
-    },
-    watch:{
-      data:{
-        deep:true,
-        handler(val){
-          this.$emit('update:select',val)
-        },
-      },
-      select:{
-        deep:true,
-        handler(val){
-          this.data = val;
-        },
-      },
-    },
-    mounted(){
-      this.data = this.$props.select;
-    },
-    methods:{
-      hasKey(key){
-        return Object.keys(this.data.options).includes(key)
-      },
-  
-      srcListInsert(){
-        this.data.options.srcList.push({url:""})
-      },
-  
-      srcListRemove(index){
-        this.data.options.srcList.splice(index, 1)
-      },
 
-      previewSrcListInsert(){
-        this.data.options.previewSrcList.push({url:""})
-      },
-  
-      previewSrcListRemove(index){
-        this.data.options.previewSrcList.splice(index, 1)
-      },
-  
-     
-  
-      handleSelectModeChange(val){
-        if (this.data.type === 'img-upload') {
-          return
-        }
-        if (val) {
-          if (this.data.options.defaultValue) {
-            if (!(this.data.options.defaultValue instanceof Array)) {
-              this.data.options.defaultValue = [this.data.options.defaultValue]
-            }
-          } else {
-            this.data.options.defaultValue = []
-          }
-        } else {
-          this.data.options.defaultValue.length
-            ? (this.data.options.defaultValue =
-            this.data.options.defaultValue[0])
-            : (this.data.options.defaultValue = null)
-        }
-      }
+<script lang="ts">
+import { defineComponent, ref, watch } from 'vue'
+import SvgIcon from '@/components/SvgIcon.vue'
+
+export default defineComponent({
+  name: 'inputConfig',
+  props: {
+    select: {
+      type: Object
+    },
+    hasKey: {
+      type: Function
     }
-  }
-  </script>
-  
-  
+  },
+  components: {
+    SvgIcon
+  },
+  emits: ['update:select'],
+  setup(props, context){
+    const data = ref<any>(props.select)
+    watch(
+      () => props.select,
+      (val) => (data.value = val)
+    )
+
+    watch(data, (val) => context.emit('update:select', val), { deep: true })
+    
+    const srcListInsert = ()=>{
+      data.value.options.srcList.push({ url:"" })
+    }
+
+    const srcListRemove = (index:number)=>{
+      data.value.options.srcList.splice(index, 1)
+    }
+
+    const previewSrcListInsert = ()=>{
+      data.value.options.previewSrcList.push({ url:"" })
+    }
+
+    const previewSrcListRemove = (index:number)=>{
+      data.value.options.previewSrcList.splice(index, 1)
+    }
+
+    return {
+      data,
+      srcListInsert,
+      srcListRemove,
+      previewSrcListInsert,
+      previewSrcListRemove,
+    }
+  },
+})
+</script>
   

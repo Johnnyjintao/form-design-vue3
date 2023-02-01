@@ -5,21 +5,21 @@
       <el-input v-model="data.options.placeholder" placeholder="placeholder"/>
     </el-form-item>
 
-    <el-form-item label="是否多选" v-if="hasKey('multiple')">
+    <el-form-item label="是否多选" v-if="hasKey!('multiple')">
       <el-switch
         v-model="data.options.multiple"
         @change="handleSelectModeChange"
       />
     </el-form-item>
 
-    <el-form-item label="是否可搜索" v-if="hasKey('filterable')">
+    <el-form-item label="是否可搜索" v-if="hasKey!('filterable')">
       <el-switch v-model="data.options.filterable" />
     </el-form-item>
 
 
-    <el-form-item label="选项" v-if="hasKey('options')">
+    <el-form-item label="选项" v-if="hasKey!('options')">
         <ul>
-          <li v-for="(element,index) in data.options.options" style="display: flex; align-items: center; margin-bottom: 5px">
+          <li :key="element" v-for="(element,index) in data.options.options" style="display: flex; align-items: center; margin-bottom: 5px">
             <el-checkbox-group v-if="data.options.multiple" v-model="data.options.defaultValue" style="margin-top: 8px">
               <el-checkbox :label="element.value" style="margin-right: 0px; margin-bottom: 0">
                 <el-input placeholder="value" v-model="element.value" :style="{width: '90px'}" />
@@ -49,16 +49,16 @@
       <el-form-item
         label="操作属性"
         v-if="
-          hasKey('rules') ||
-          hasKey('readonly') ||
-          hasKey('disabled') ||
-          hasKey('allowClear')
+          hasKey!('rules') ||
+          hasKey!('readonly') ||
+          hasKey!('disabled') ||
+          hasKey!('allowClear')
         "
       >
-        <el-checkbox v-if="hasKey('rules')" v-model="data.options.rules.required">必填</el-checkbox>
-        <el-checkbox v-if="hasKey('readonly')" v-model="data.options.readonly">只读</el-checkbox>
-        <el-checkbox v-if="hasKey('disabled')" v-model="data.options.disabled">禁用</el-checkbox>
-        <el-checkbox v-if="hasKey('clearable')" v-model="data.options.clearable">清除</el-checkbox>
+        <el-checkbox v-if="hasKey!('rules')" v-model="data.options.rules.required">必填</el-checkbox>
+        <el-checkbox v-if="hasKey!('readonly')" v-model="data.options.readonly">只读</el-checkbox>
+        <el-checkbox v-if="hasKey!('disabled')" v-model="data.options.disabled">禁用</el-checkbox>
+        <el-checkbox v-if="hasKey!('clearable')" v-model="data.options.clearable">清除</el-checkbox>
       </el-form-item>
       <el-alert
         title="支持配置所有参数，更多参数可参考 https://element.eleme.cn/#/zh-CN/component/select"
@@ -69,91 +69,80 @@
   </div>
 </template>
 
-<script>
-  import Draggable from 'vuedraggable'
-  import SvgIcon from '@/components/SvgIcon.vue'
-  
-  export default {
-    name: 'inputConfig',
-    components: {
-      Draggable,
-      SvgIcon,
+<script lang="ts">
+import { defineComponent, ref, watch } from 'vue'
+import SvgIcon from '@/components/SvgIcon.vue'
+export default defineComponent({
+  name: 'selectConfig',
+  props: {
+    select: {
+      type: Object
     },
-    props: {
-      select: {
-        type: Object
-      }
-    },
-    emits: ['update:select'],
-    data(){
-      return {
-        data:undefined
-      }
-    },
-    watch:{
-      data:{
-        deep:true,
-        handler(val){
-          
-          this.$emit('update:select',val)
-        },
-      },
-      select:{
-        deep:true,
-        handler(val){
-          console.log("111")
-          this.data = val;
-        },
-      },
-    },
-    mounted(){
-      this.data = this.$props.select;
-    },
-    methods:{
-      hasKey(key){
-        return Object.keys(this.data.options).includes(key)
-      },
-  
-      handleInsertOption(){
-        const index = this.data.options.options.length + 1
-        this.data.options.options.push({
-          label: `label ${index}`,
-          value: `value ${index}`
-        })
-      },
-  
-      handleOptionsRemove(index){
-        if (this.data.type === 'grid') {
-          this.data.columns.splice(index, 1)
-        } else {
-          this.data.options.options.splice(index, 1)
-        }
-      },
-  
-     
-  
-      handleSelectModeChange(val){
-        if (this.data.type === 'img-upload') {
-          return
-        }
-        if (val) {
-          if (this.data.options.defaultValue) {
-            if (!(this.data.options.defaultValue instanceof Array)) {
-              this.data.options.defaultValue = [this.data.options.defaultValue]
-            }
-          } else {
-            this.data.options.defaultValue = []
-          }
-        } else {
-          this.data.options.defaultValue.length
-            ? (this.data.options.defaultValue =
-            this.data.options.defaultValue[0])
-            : (this.data.options.defaultValue = "")
-        }
+    hasKey: {
+      type: Function
+    }
+  },
+  components: {
+    SvgIcon
+  },
+  emits: ['update:select'],
+  setup(props, context){
+    const data = ref<any>(props.select)
+    watch(
+      () => props.select,
+      (val) => (data.value = val)
+    )
+
+    watch(data, (val) => context.emit('update:select', val), { deep: true })
+
+    const handleInsertOption = ()=>{
+      const index = data.value.options.options.length + 1
+      data.value.options.options.push({
+        label: `label ${index}`,
+        value: `value ${index}`
+      })
+    }
+
+    const handleOptionsRemove = (index:number)=>{
+      if (data.value.type === 'grid') {
+        data.value.columns.splice(index, 1)
+      } else {
+        data.value.options.options.splice(index, 1)
       }
     }
-  }
-  </script>
+
+    const handleSelectModeChange = (val:boolean)=>{
+      if (data.value.type === 'img-upload') {
+        return
+      }
+      if (val) {
+        if (data.value.options.defaultValue) {
+          if (!(data.value.options.defaultValue instanceof Array)) {
+            data.value.options.defaultValue = [data.value.options.defaultValue]
+          }
+        } else {
+          data.value.options.defaultValue = []
+        }
+      } else {
+        data.value.options.defaultValue.length
+          ? (data.value.options.defaultValue =
+          data.value.options.defaultValue[0])
+          : (data.value.options.defaultValue = "")
+      }
+    }
+
+    return {
+      data,
+      handleInsertOption,
+      handleOptionsRemove,
+      handleSelectModeChange
+    }
+  },
+})
+</script>
+  
+
+
   
   
   

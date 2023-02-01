@@ -12,7 +12,7 @@
       <el-input v-model="data.options.width" />
     </el-form-item>
 
-    <component :is="data.type+`Config`" v-model:select="data">
+    <component :is="data.type+`Config`" v-model:select="data" :hasKey="hasKey">
     </component>
 
     <template v-if="data.type !== 'grid' && hasKey('rules')">
@@ -108,7 +108,7 @@ export default defineComponent({
   props: {
     select: {
       type: Object
-    }
+    },
   },
   emits: ['update:select'],
   setup(props, context){
@@ -120,13 +120,13 @@ export default defineComponent({
 
     watch(data, (val) => context.emit('update:select', val), { deep: true })
     
-    const hasKey = (key: string) =>
-      Object.keys(data.value.options).includes(key)
-
-      return {
-        data,
-        hasKey,
-      }
+    const hasKey = (key: string) => Object.keys(data.value.options).includes(key)
+    const hahaha = (key: string) => Object.keys(data.value.options).includes(key)
+    return {
+      data,
+      hasKey,
+      hahaha
+    }
   },
 })
 </script>

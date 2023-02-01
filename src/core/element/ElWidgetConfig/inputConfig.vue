@@ -47,26 +47,15 @@
       <el-form-item
         label="操作属性"
         v-if="
-          hasKey('rules') ||
-          hasKey('readonly') ||
-          hasKey('disabled') ||
-          hasKey('allowClear')
-        "
-      >
-        <el-checkbox
-          v-if="hasKey('rules')"
-          v-model="data.options.rules.required"
-          >必填</el-checkbox
-        >
-        <el-checkbox v-if="hasKey('readonly')" v-model="data.options.readonly"
-          >只读</el-checkbox
-        >
-        <el-checkbox v-if="hasKey('disabled')" v-model="data.options.disabled"
-          >禁用</el-checkbox
-        >
-        <el-checkbox v-if="hasKey('clearable')" v-model="data.options.clearable"
-          >清除</el-checkbox
-        >
+          hasKey!('rules') ||
+          hasKey!('readonly') ||
+          hasKey!('disabled') ||
+          hasKey!('allowClear')
+        ">
+        <el-checkbox v-if="hasKey!('rules')" v-model="data.options.rules.required" >必填</el-checkbox>
+        <el-checkbox v-if="hasKey!('readonly')" v-model="data.options.readonly">只读</el-checkbox>
+        <el-checkbox v-if="hasKey!('disabled')" v-model="data.options.disabled">禁用</el-checkbox>
+        <el-checkbox v-if="hasKey!('clearable')" v-model="data.options.clearable">清除</el-checkbox>
       </el-form-item>
       <el-alert
         title="支持配置所有参数，更多参数可参考 https://element.eleme.cn/#/zh-CN/component/select"
@@ -78,46 +67,34 @@
   </div>
 </template>
   
-<script>
-  
-  export default {
-    name: 'inputConfig',
-   
-    props: {
-      select: {
-        type: Object
-      }
+<script lang="ts">
+import { defineComponent, ref, watch } from 'vue'
+export default defineComponent({
+  name: 'inputConfig',
+  props: {
+    select: {
+      type: Object
     },
-    emits: ['update:select'],
-    data(){
-      return {
-        data:undefined
-      }
-    },
-    watch:{
-      data:{
-        deep:true,
-        handler(val){
-          this.$emit('update:select',val)
-        },
-      },
-      select:{
-        deep:true,
-        handler(val){
-          this.data = val;
-        },
-      },
-    },
-    mounted(){
-      this.data = this.$props.select;
-    },
-    methods:{
-      hasKey(key){
-        return Object.keys(this.data.options).includes(key)
-      },
+    hasKey: {
+      type: Function
     }
-  }
-  </script>
-  
+  },
+  emits: ['update:select'],
+  setup(props, context){
+    const data = ref<any>(props.select)
+    watch(
+      () => props.select,
+      (val) => (data.value = val)
+    )
+
+    watch(data, (val) => context.emit('update:select', val), { deep: true })
+    
+    return {
+      data,
+    }
+  },
+})
+</script>
+
   
   

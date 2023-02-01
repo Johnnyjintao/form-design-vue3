@@ -5,8 +5,8 @@
   </template>
   
   <script>
-  
-  export default {
+  import { defineComponent } from 'vue'
+  export default defineComponent({
     name: 'textItem',
     components: {
     },
@@ -28,6 +28,6 @@
         required: true
       }
     },
-  }
+  })
   </script>
   

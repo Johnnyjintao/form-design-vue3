@@ -7,17 +7,14 @@
             <div class="components">
               <ComponentGroup
                 title="表单组件"
-                :fields="basicFields"
                 :list="element.basicComponents"
               />
               <ComponentGroup
                 title="展示组件"
-                :fields="advanceFields"
                 :list="element.advanceComponents"
               />
               <ComponentGroup
                 title="布局组件"
-                :fields="layoutFields"
                 :list="element.layoutComponents"
               />
             </div>
@@ -165,7 +162,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, PropType, toRefs, watchEffect } from 'vue'
+import { defineComponent, reactive, toRefs, watchEffect } from 'vue'
 import { ElMessage } from 'element-plus'
 import { defaultsDeep } from 'lodash'
 import CodeEditor from '@/components/CodeEditor.vue'
@@ -213,32 +210,7 @@ export default defineComponent({
       type: Boolean,
       default: true
     },
-    basicFields: {
-      type: Array as PropType<Array<string>>,
-      default: () => [
-        'input',
-        'password',
-        'textarea',
-        'number',
-        'radio',
-        'checkbox',
-        'time',
-        'date',
-        'rate',
-        'select',
-        'switch',
-        'slider',
-        'text'
-      ]
-    },
-    advanceFields: {
-      type: Array as PropType<Array<string>>,
-      default: () => ['text', 'image']
-    },
-    layoutFields: {
-      type: Array as PropType<Array<string>>,
-      default: () => ['grid']
-    }
+   
   },
   setup() {
     const state = reactive({

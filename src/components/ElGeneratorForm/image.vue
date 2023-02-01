@@ -13,8 +13,9 @@
   </template>
   
   <script>
+  import { defineComponent } from 'vue'
   
-  export default {
+  export default defineComponent({
     name: 'textItem',
     components: {
     },
@@ -36,8 +37,8 @@
         required: true
       }
     },
-    methods:{
-      initPreviewSrcList(url,list){
+    setup(){
+      function initPreviewSrcList(url,list){
         let newList = [];
         list.forEach(item=>{
           if(item.url !== url){
@@ -47,8 +48,12 @@
         newList.unshift(url);
         return newList;
       }
+      return {
+        initPreviewSrcList
+      }
     }
-  }
+    
+  })
   </script>
   
 

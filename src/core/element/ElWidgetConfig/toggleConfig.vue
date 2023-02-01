@@ -37,66 +37,33 @@
 
   </div>
 </template>
-<script>
-import Draggable from 'vuedraggable'
-import SvgIcon from '@/components/SvgIcon.vue'
-export default {
-  name: 'inputConfig',
-  components: {
-    Draggable,
-    SvgIcon
-  },
+<script lang="ts">
+import { defineComponent, ref, watch } from 'vue'
+export default defineComponent({
+  name: 'toggleConfig',
   props: {
     select: {
       type: Object
+    },
+    hasKey: {
+      type: Function
     }
   },
   emits: ['update:select'],
-  data(){
+  setup(props, context){
+    const data = ref<any>(props.select)
+    watch(
+      () => props.select,
+      (val) => (data.value = val)
+    )
+
+    watch(data, (val) => context.emit('update:select', val), { deep: true })
+    
     return {
-      data:undefined
+      data,
     }
   },
-  watch:{
-    data:{
-      deep:true,
-      handler(val){
-        this.$emit('update:select',val)
-      },
-    },
-    select:{
-      deep:true,
-      handler(val){
-        this.data = val;
-      },
-    },
-  },
-  mounted(){
-    this.data = this.$props.select;
-  },
-  methods:{
-    hasKey(key){
-      return Object.keys(this.data.options).includes(key)
-    },
-
-
-    handleInsertOption(){
-      const index = this.data.options.options.length + 1
-      this.data.options.options.push({
-        label: `label ${index}`,
-        value: `value ${index}`
-      })
-    },
-
-    handleOptionsRemove(index){
-      if (this.data.type === 'grid') {
-        this.data.columns.splice(index, 1)
-      } else {
-        this.data.options.options.splice(index, 1)
-      }
-    },
-  }
-}
+})
 </script>
   
   
